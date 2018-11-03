@@ -10,7 +10,7 @@ using Z.EntityFramework.Plus;
 
 namespace SPbSU.VK.TimeTable.Repositories
 {
-	public class CrudRepository<TEntity> : ICrudRepository<TEntity>
+	public abstract class CrudRepository<TEntity> : ICrudRepository<TEntity>
 		where TEntity : BaseModel
 	{
 		protected readonly VkTimeTableContext context;

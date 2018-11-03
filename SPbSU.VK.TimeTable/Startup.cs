@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SPbSU.VK.TimeTable.IRepositories;
+using SPbSU.VK.TimeTable.IServices;
 using SPbSU.VK.TimeTable.Repositories;
+using SPbSU.VK.TimeTable.Services;
 
 namespace SPbSU.VK.TimeTable
 {
@@ -25,6 +27,9 @@ namespace SPbSU.VK.TimeTable
 			services.AddDbContext<VkTimeTableContext>(options => options.UseSqlServer(connection));
 			services.AddScoped<ICalendarRepository, CalendarRepository>();
 			services.AddScoped<IUserRepository, UserRepository>();
+			services.AddScoped<IUserCalendarRepository, UserCalendarRepository>();
+			services.AddScoped<IEventRepository, EventRepository>();
+			services.AddSingleton<ICalendarService, CalendarService>();
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 		}
