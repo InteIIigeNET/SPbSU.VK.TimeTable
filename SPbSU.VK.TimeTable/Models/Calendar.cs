@@ -2,9 +2,8 @@
 
 namespace SPbSU.VK.TimeTable.Models
 {
-	public class Calendar
+	public class Calendar : BaseModel
 	{
-		public long Id { get; set; }
 		public ICollection<Event> Events { get; set; }
 		public string Title { get; set; }
 	}

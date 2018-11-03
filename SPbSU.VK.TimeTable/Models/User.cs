@@ -2,9 +2,9 @@
 
 namespace SPbSU.VK.TimeTable.Models
 {
-	public class User
+	public class User : BaseModel
 	{
-		public string Id { get; set; }
+		public string VkId { get; set; }
 		public ICollection<Calendar> Calendars { get; set; }
 	}
 }
