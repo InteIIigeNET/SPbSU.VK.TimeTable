@@ -23,23 +23,53 @@ namespace SPbSU.VK.TimeTable.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Add(long calendarId, [FromBody]EventViewModel eventViewModel)
 		{
-			using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+			var newEvent = new Event
 			{
-				var calendar = await calendarRepository.GetAsync(calendarId);
+				Description = eventViewModel.Description,
+				Title = eventViewModel.Title,
+				EventDateTime = eventViewModel.EventDateTime,
+				CalendarId = calendarId
+			};
 
-				var newEvent = new Event
-				{
-					Description = eventViewModel.Description,
-					Title = eventViewModel.Title,
-					EventDateTime = eventViewModel.EventDateTime
-				};
+			await eventRepository.CreateAsync(newEvent);
 
-				newEvent = await eventRepository.CreateAsync(newEvent);
+			return Ok();
+		}
 
-				calendar.Events.Add(newEvent);
+		[HttpDelete]
+		public async Task<ActionResult> Delete(long id)
+		{
+			var isSuceed = await eventRepository.DeleteAsync(id);
+			if (isSuceed)
+				return Ok();
+			return NotFound();
+		}
 
-				tran.Complete();
-			}
+		[HttpPost]
+		public async Task<ActionResult> Update(long eventId, EventViewModel eventViewModel)
+		{
+			var isSuceed = await eventRepository.UpdateAsync(eventId, e => new Event
+			{
+				Description = eventViewModel.Description,
+				Title = eventViewModel.Title,
+				EventDateTime = eventViewModel.EventDateTime
+			});
+
+			if (isSuceed)
+				return Ok();
+			return NotFound();
+		}
+
+		[HttpGet]
+		public async Task<ActionResult> Get(long id)
+		{
+			return Ok(await eventRepository.GetAsync(id));
+		}
+
+		[HttpGet]
+		public async Task<ActionResult> GetAll(long calendarId)
+		{
+			return Ok(eventRepository.FindAll(e => e.CalendarId == calendarId));
 		}
     }
 }
