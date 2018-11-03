@@ -9,10 +9,11 @@ namespace SPbSU.VK.TimeTable.IRepositories
 	public interface ICrudRepository<TEntity> 
 		where TEntity : BaseModel
 	{
-		Task CreateAsync(TEntity entity);
-		Task UpdateAsync(TEntity entity);
-		Task DeleteAsync(long id);
+		Task<TEntity> CreateAsync(TEntity entity);
+		Task<bool> UpdateAsync(long id, Expression<Func<TEntity, TEntity>> expression);
+		Task<bool> DeleteAsync(long id);
 		Task<TEntity> GetAsync(long id);
-		IReadOnlyCollection<TEntity> FindAll(Expression<Func<TEntity, bool>> expression);
+		IReadOnlyCollection<TEntity> FindAll(Expression<Func<TEntity, bool>> expression, 
+			params Expression<Func<TEntity, object>>[] includeProperties);
 	}
 }

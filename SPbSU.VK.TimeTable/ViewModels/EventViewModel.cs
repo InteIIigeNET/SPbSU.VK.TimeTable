@@ -1,14 +1,11 @@
 ﻿using System;
 
-namespace SPbSU.VK.TimeTable.Models
+namespace SPbSU.VK.TimeTable.ViewModels
 {
-	public class Event : BaseModel
+	public class EventViewModel
 	{
 		public DateTime EventDateTime { get; set; }
 		public string Title { get; set; }
 		public string Description { get; set; }
-
-		public long CalendarId { get; set; }
-		public Calendar Calendar { get; set; }
 	}
 }

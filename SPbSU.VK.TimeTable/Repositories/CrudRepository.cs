@@ -1,9 +1,10 @@
-﻿using SPbSU.VK.TimeTable.IRepositories;
+﻿using Microsoft.EntityFrameworkCore;
+using SPbSU.VK.TimeTable.IRepositories;
 using SPbSU.VK.TimeTable.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Z.EntityFramework.Plus;
 
@@ -12,28 +13,35 @@ namespace SPbSU.VK.TimeTable.Repositories
 	public class CrudRepository<TEntity> : ICrudRepository<TEntity>
 		where TEntity : BaseModel
 	{
-		private readonly VkTimeTableContext context;
+		protected readonly VkTimeTableContext context;
 
 		public CrudRepository(VkTimeTableContext context)
 		{
 			this.context = context;
 		}
 
-		public async Task CreateAsync(TEntity entity)
+		public async Task<TEntity> CreateAsync(TEntity entity)
 		{
-			await context.AddAsync(entity);
+			var addedEntry = await context.AddAsync(entity);
 			await context.SaveChangesAsync();
+			return addedEntry.Entity;
 		}
 
-		public async Task DeleteAsync(long id)
+		public async Task<bool> DeleteAsync(long id)
 		{
-			await context.Set<TEntity>().Where(e => e.Id == id).DeleteAsync();
-			await context.SaveChangesAsync();
+			return await context.Set<TEntity>().Where(e => e.Id == id).DeleteAsync() == 1;
 		}
 
-		public IReadOnlyCollection<TEntity> FindAll(Expression<Func<TEntity, bool>> expression)
+		public IReadOnlyCollection<TEntity> FindAll(Expression<Func<TEntity, bool>> expression, params Expression<Func<TEntity, object>>[] includeProperties)
 		{
-			return context.Query<TEntity>().Where(expression).ToArray();
+			var query = context.Query<TEntity>().Where(expression);
+
+			foreach (var includeParam in includeProperties)
+			{
+				query = query.Include(includeParam);
+			}
+
+			return query.ToArray();
 		}
 
 		public Task<TEntity> GetAsync(long id)
@@ -41,10 +49,11 @@ namespace SPbSU.VK.TimeTable.Repositories
 			return context.Set<TEntity>().FindAsync(id);
 		}
 
-		public async Task UpdateAsync(TEntity entity)
+		public async Task<bool> UpdateAsync(long id, Expression<Func<TEntity, TEntity>> expression)
 		{
-			context.Set<TEntity>().Update(entity);
-			await context.SaveChangesAsync();
+			return await context.Set<TEntity>()
+				.Where(e => e.Id == id)
+				.UpdateAsync(expression) == 1;
 		}
 	}
 }
